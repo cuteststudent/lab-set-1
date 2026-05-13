@@ -41,7 +41,12 @@ async function setup() {
 const start = Date.now();
 
 async function draw() {
+  try {
    activity.draw((Date.now() - start) / 1000);
+  } catch (e){
+    noLoop();
+    throw e;
+  }
 }
 
 function windowResized() {

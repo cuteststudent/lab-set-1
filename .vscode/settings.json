@@ -1,5 +1,9 @@
 {
     "files.exclude": {
-        "node_modules": true,
+        "node_modules": false,
+        "lab*/activity*/": false,
+        ".vscode/": false,
+        "*.*": false,
+        "utils": false
     }
 }

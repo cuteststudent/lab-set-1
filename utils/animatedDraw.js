@@ -1,3 +1,11 @@
+import StackTracey from 'stacktracey';
+import * as Buffer from 'buffer';
+import * as WI from './workspaceIntegration';
+import { drawAxes } from './axes';
+import p5 from "p5";
+import { draw } from '../lab1/02-lollipop-tree';
+window.Buffer = Buffer.Buffer;
+
 const pauseException = { "pauseException": true };
 let f = 0;
 let c = 0;
@@ -7,6 +15,7 @@ function pause(r = 1) {
     if (f >= c) {
         f = 0;
         c++;
+        pauseException.stack = new StackTracey();
         throw pauseException;
     }
 }
@@ -16,8 +25,9 @@ function smoothstep(t) {
     return Math.pow(s, 2);  // increase exponent for stronger ease
 }
 
+let funcNames = ["translate", "rotateX", "rotateY", "rotateZ", "cylinder", "sphere", "scale", "push", "pop"];
 let oldFuncs = {};
-export function wrap(...funcNames) {
+function wrap() {
     for (let name of funcNames) {
         let oldFunc = window[name];
         oldFuncs[name] = oldFunc;
@@ -43,12 +53,30 @@ export function wrap(...funcNames) {
                     let s = 50;
                     for (let i = 0; i < s; i++) {
                         let t = smoothstep((i + 1) / s);
-                        push();
+                        oldFuncs.push();
                         oldFunc(...p.map(v => 1 + (v - 1) * t));
                         pause(1);
-                        pop();
+                        oldFuncs.pop();
                     }
                     oldFunc(...p);
+                }
+                break;
+
+            case "push":
+                window[name] = function () {
+                    oldFunc();
+                    stack.push([..._renderer.uModelMatrix.mat4]);
+                    //pause(10);
+                }
+                break;
+            case "pop":
+                window[name] = function () {
+                    for (let i = 0; i < 50; i++ ){
+                        pause(1);
+                    }
+                    oldFunc();
+                    stack.pop();
+                    
                 }
                 break;
             default:
@@ -62,24 +90,50 @@ export function wrap(...funcNames) {
     }
 }
 
-export function unwrap() {
+function unwrap() {
     for (const [name, f] of Object.entries(oldFuncs)) {
         window[name] = f;
     }
     oldFuncs = {};
 }
 
-
+let stack = [];
+let lastHighlight = "";
 export function drawWithPause(drawFunc) {
     try {
+        wrap();
+        stack = [];
         f = 0;
         drawFunc();
         pause(100);
         c = 0;
+        unwrap();
     } catch (e) {
-        if (e == pauseException)
+        unwrap();
+        drawAxes();
+        while ( stack.length ){
+            resetMatrix();
+            applyMatrix(...stack.pop());
+            drawAxes(alpha=64);
+        }
+        if (e == pauseException) {
+            for (let frame of e.stack.items) {
+                if (frame.fileRelative.match(/lab[0-9]+\/[0-9]+/)) {
+                    //console.log(frame.file, frame.line)
+                    frame = e.stack.withSource(frame);
+                    let newHighlight = `${frame.fileRelative}: ${frame.line}`;
+                    if (newHighlight != lastHighlight) {
+                        console.log(frame.sourceLine, frame.fileRelative, frame.line);
+                        WI.highlight(frame.fileRelative, frame.line);
+                        lastHighlight = newHighlight;
+                    }
+                    break;
+                }
+            }
             return;
-        throw e;
+        } else {
+            throw e;
+        }
     } finally {
 
     }

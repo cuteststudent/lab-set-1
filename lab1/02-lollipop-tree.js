@@ -12,6 +12,8 @@ export function draw() {
 
     translate(150,140,0);
 
+    push();
+
     rotateX(45);
     scale(.5);
 
@@ -21,4 +23,6 @@ export function draw() {
     translate(0, -90, 0);
     fill(50, 180, 50);
     sphere();
+
+    pop();
 }

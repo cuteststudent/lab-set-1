@@ -24,7 +24,9 @@ export function preload() {
   font = loadFont("https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf");
 }
 
-export function drawAxes(length = 200, radius = 3) {
+export function drawAxes(alpha = 255) {
+  let length = 200;
+  let radius = 3;
   const headLength = length * 0.15;
   const headRadius = radius * 3;
   const shaftLength = length - headLength;
@@ -33,7 +35,7 @@ export function drawAxes(length = 200, radius = 3) {
 
   // -- X axis (red) --
   push();
-    fill(220, 50, 50);
+    fill(220, 50, 50, alpha);
     rotateZ(-90);
     translate(0, shaftLength / 2, 0);
     cylinder(radius, shaftLength);
@@ -43,7 +45,7 @@ export function drawAxes(length = 200, radius = 3) {
 
   // -- Y axis (green) --
   push();
-    fill(50, 200, 50);
+    fill(50, 200, 50, alpha);
     translate(0, shaftLength / 2, 0);
     cylinder(radius, shaftLength);
     translate(0, shaftLength / 2 + headLength / 2, 0);
@@ -52,7 +54,7 @@ export function drawAxes(length = 200, radius = 3) {
 
   // -- Z axis (blue) --
   push();
-    fill(50, 100, 220);
+    fill(50, 100, 220, alpha);
     rotateX(90);
     translate(0, shaftLength / 2, 0);
     cylinder(radius, shaftLength);
@@ -66,17 +68,17 @@ export function drawAxes(length = 200, radius = 3) {
   textFont(font);
 
   push();
-    fill(220, 50, 50);
+    fill(220, 50, 50, alpha);
     axisLabel("X", labelOffset, 0, 0);
   pop();
 
   push();
-    fill(50, 200, 50);
+    fill(50, 200, 50, alpha);
     axisLabel("Y", 0, labelOffset, 0);
   pop();
 
   push();
-    fill(50, 100, 220);
+    fill(50, 100, 220, alpha);
     axisLabel("Z", 0, 0, labelOffset);
   pop();
   }

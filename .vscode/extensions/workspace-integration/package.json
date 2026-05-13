@@ -1,0 +1,21 @@
+{
+  "name": "workspace-integration",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": ["*"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "workspace-integration.highlight",
+        "title": "Highlight Line"
+      },
+      {
+        "command": "workspace-integration.breakpoint",
+        "title": "Set Breakpoint"
+      }
+    ]
+  }
+}
